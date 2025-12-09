@@ -1,15 +1,16 @@
-import './index.css';
-import './App.css';
+import "./index.css";
+import "./App.css";
+import Navbar from "./Components/Navbar/Navbar";
+import { BrowserRouter } from "react-router-dom";
 
 function App() {
-
   return (
     <>
-      <h3 className='text-3xl font-bold underline text-red-500'>
-        Hello world!
-      </h3>
+      <BrowserRouter>
+        <Navbar />
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
