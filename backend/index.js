@@ -1,6 +1,7 @@
 require("dotenv").config()
 const express = require("express");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT=3000;
 
@@ -10,10 +11,11 @@ app.use(express.json())
 app.use(express.urlencoded())   
 /* 'username' of 'req.body' as it is undefined. 에러 수정 <-뜰 시 사용
     json 파일을 익스프레스 서버에서 해석하는 기능
- */
+*/
+app.use(cookieParser()); //express에서 cookie를 읽게 함.
 
 
-    
+
 app.use("/api/auth",userRoutes);
 
 

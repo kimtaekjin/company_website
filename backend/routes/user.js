@@ -94,9 +94,12 @@ router.post("/login", async (req, res) => {
       { expiresIn: "24h" } //JWT의 유효기간
     );
 
+    // console.log("token: ",token);
+    
+
     res.cookie("token", token, {
       httpOnly: true, //자바스크립트로 토큰을 못 가져오게 하는 설정 -보안강화-
-      secure: "production", //보통 환경 변수를 확인해서 개발 환경에서는 false, 배포 환경에서는 true로 설정하는 방식
+      secure: false, //보통 환경 변수를 확인해서 개발 환경에서는 false, 배포 환경에서는 true로 설정하는 방식
       sameSite: "strict", //CSRF 공격 방지용 ,외부 사이트에서 우리 서버에 POST 요청을 보내도 쿠키가 안 붙
       maxAge: 24 * 60 * 60 * 1000, //24H
     });
@@ -111,6 +114,57 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("서버 오류:", error.message);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+router.post("/logout", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(400).json({ message: "이미 로그아웃된 상태입니다." });
+      //400에러는 클라이언트가 보낸 요청(request)에 문제가 있어서 서버가 처리할 수 없는 상태
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      //클라이언트 토큰과 env의 토큰 값을 비교하여 검증
+
+      const user = await User.findById(decoded.userId);
+
+      if (user) {
+        user.isLoggedIn = false;
+        await user.save();
+      }
+    } catch (error) {
+      console.log("토큰 검증 오류: ", error.message);
+    }
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    res.json({ message: "로그아웃되었습니다." });
+  } catch (error) {
+    console.log("로그아웃 오류: ", error.message);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+});
+
+router.delete("/delete/:userId", async (req, res) => {
+  // :userId 이부분은 파라미터 값이 들어온다.
+  try {
+    const user = await User.findByIdAndDelete(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+      //404 에러는 클라이언트가 요청한 리소스가 서버에 존재하지 않는 상태 즉, 찾을 수 없는 페이지 또는 데이터 요청
+    }
+    res.json({ message: "사용자가 성공적으로 삭제되었습니다." });
+  } catch (error) {
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    //500에러 = 서버 내부에서 오류 발생
   }
 });
 
