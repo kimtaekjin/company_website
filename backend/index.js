@@ -4,6 +4,13 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT=3000;
 
+const userRoutes = require("./routes/user");
+
+app.use(express.json())
+app.use(express.urlencoded())   //json 파일을 익스프레스 서버에서 해석하는 기능
+
+app.use("/api/auth",userRoutes);
+
 
 app.get("/",(req,res)=>{
     app.send("Hello world");
