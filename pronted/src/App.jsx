@@ -18,6 +18,11 @@ import Service from "./Page/Service/Service";
 import Contact from "./Page/Contact/Contact";
 import AdminLogin from "./Page/Admin/AdminLogin";
 import { useEffect, useState } from "react";
+import AdminPosts from "./Page/Admin/AdminPosts";
+import AdminCreatePost from "./Page/Admin/AdminCreatePost";
+import AdminEditPost from "./Page/Admin/AdminEditPost";
+import AdminContacts from "./Page/Admin/AdminContacts";
+import AdminNavbar from "./Components/AdminNavbar/AdminNavbar";
 
 function AuthRedirectRoute() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -52,6 +57,14 @@ function Layout() {
       <Navbar />
       <Outlet />
       <Footer />
+    </>
+  );
+}
+function AdminLayout() {
+  return (
+    <>
+      <AdminNavbar />
+      <Outlet />
     </>
   );
 }
@@ -90,10 +103,27 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: <AuthRedirectRoute />,
+    children: [{ index: true, element: <AdminLogin /> }],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
     children: [
       {
-        index: true,
-        element: <AdminLogin />,
+        path: "posts",
+        element: <AdminPosts />,
+      },
+      {
+        path: "create-post",
+        element: <AdminCreatePost />,
+      },
+      {
+        path: "edit-post/:id",
+        element: <AdminEditPost />,
+      },
+      {
+        path: "contacts",
+        element: <AdminContacts />,
       },
     ],
   },
