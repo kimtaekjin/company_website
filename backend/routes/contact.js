@@ -22,6 +22,8 @@ const authenticateToken = (req, res, next) => {
 router.post("/", async (req, res) => {
   try {
     const { name, email, phone, message, status } = req.body;
+    console.log("도달::",status);
+    
 
     const contact = new Contact({
       name,
@@ -34,6 +36,7 @@ router.post("/", async (req, res) => {
     await contact.save();
     res.status(201).json({ message: "문의가 성공적으로 등록되었습니다." });
     //201 상태 = 요청이 성공했고 그 결과로 새로운 리소스가 생성됨
+    
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "서버 에러가 발생했습니다." });

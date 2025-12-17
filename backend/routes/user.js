@@ -173,7 +173,7 @@ router.post("/verify-token",(req,res)=>{
   
   
   const token = req.cookies.token;
-  console.log("token확인::",token);
+  // console.log("token확인::",token);
   
   if(!token){
     return res.status(400).json({isValid:false,message:"토큰이 유효하지 않습니다."})
