@@ -62,5 +62,41 @@ router.get("/:id",authenticateToken, async (req, res) => {
     res.status(500).json({ message: "서버 에러가 발생했습니다." });
   }
 });
+// *put은 업데이트
+router.put("/:id", async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({ message: "문의를 찾을 수 없습니다." });
+      //404 에러 = 클라이언트가 요청한 리소스(URL, 파일, API 등)를 서버에서 찾을 수 없음
+    }
+
+    res.json({ message: "문의 상태가 성공적으로 수정되었습니다.", contact });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "서버 에러가 발생했습니다." });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({ message: "문의를 찾을 수 없습니다." });
+    }
+    res.json({ message: "문의가 성공적으로 삭제되었습니다." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "서버 에러가 발생했습니다." });
+  }
+});
 
 module.exports = router;
