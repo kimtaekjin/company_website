@@ -8,6 +8,7 @@ const PORT=3000;
 
 const userRoutes = require("./routes/user");
 const contaactRoutes = require("./routes/contact");
+const postRoutes = require("./routes/post");
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -26,6 +27,8 @@ app.use(cookieParser()); //express에서 cookie를 읽게 함.
 app.use("/api/auth",userRoutes);
 
 app.use("/api/contact",contaactRoutes);
+
+app.use("/api/post",postRoutes);
 
 
 app.get("/",(req,res)=>{
