@@ -73,7 +73,7 @@ router.put("/:id", async (req, res) => {
     const contact = await Contact.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true }
+      { new: true } //업데이트된 이후의 문서를 반환
     );
 
     if (!contact) {
