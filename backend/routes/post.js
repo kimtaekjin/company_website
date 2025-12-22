@@ -3,12 +3,15 @@ const router = express.Router();
 const Post = require("../models/Post");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const { findById } = require("../models/Contact");
 
 const authenticateToken = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: "토큰이 없습니다." });
+    return res.status(401).json({
+      message: "토큰이 없습니다.",
+    });
   }
 
   try {
@@ -16,7 +19,9 @@ const authenticateToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "유효하지 않은 토큰입니다." });
+    return res.status(403).json({
+      message: "유효하지 않은 토큰입니다.",
+    });
   }
 };
 
@@ -24,7 +29,9 @@ router.post("/", async (req, res) => {
   try {
     const { title, content, fileUrl } = req.body;
 
-    const latestPost = await Post.findOne().sort({ number: -1 });
+    const latestPost = await Post.findOne().sort({
+      number: -1,
+    });
     const nextNumber = latestPost ? latestPost.number + 1 : 1;
 
     const post = new Post({
@@ -37,16 +44,22 @@ router.post("/", async (req, res) => {
     await post.save();
     res.status(201).json(post);
   } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+    });
   }
 });
 
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find().sort({
+      createdAt: -1,
+    });
     res.json(posts);
   } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+    });
   }
 });
 
@@ -54,34 +67,82 @@ router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) {
-      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+      return res.status(404).json({
+        message: "게시글을 찾을 수 없습니다.",
+      });
     }
 
-    // const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || req.ip;
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || req.ip;
 
-    // const userAgent = req.headers["user-agent"];
+    const userAgent = req.headers["user-agent"];
 
-    // const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    // const hasRecentView = post.viewLogs.some(
-    //   (log) =>
-    //     log.ip === ip &&
-    //     log.userAgent === userAgent &&
-    //     new Date(log.timestamp) > oneDayAgo
-    // );
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const hasRecentView = post.viewLogs.some(
+      (log) => log.ip === ip && log.userAgent === userAgent && new Date(log.timestamp) > oneDayAgo
+    );
 
-    // if (!hasRecentView) {
-    //   post.views += 1;
-    //   post.viewLogs.push({
-    //     ip,
-    //     userAgent,
-    //     timestamp: new Date(),
-    //   });
-    //   await post.save();
-    // }
+    if (!hasRecentView) {
+      post.views += 1;
+      post.viewLogs.push({
+        ip,
+        userAgent,
+        timestamp: new Date(),
+      });
+      await post.save();
+    }
 
     res.json(post);
   } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+    });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { title, content, fileUrl } = req.body;
+
+    const post = await findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({
+        message: "게시글을 찾을 수 없습니다.",
+      });
+    }
+
+    post.title = title;
+    post.content = content;
+    post.fileUrl = fileUrl;
+    post.updatedAt = Date.now();
+
+    await post.save();
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+    });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const { title, content, fileUrl } = req.body;
+
+    const post = await findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({
+        message: "게시글을 찾을 수 없습니다.",
+      });
+    }
+
+    await post.deleteOne();
+    res.json({
+      message: "게시글이 삭제되었습니다.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "서버 오류가 발생했습니다.",
+    });
   }
 });
 
