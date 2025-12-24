@@ -54,6 +54,7 @@ const SinglePost = () => {
   };
 
   if (loading) {
+    //“데이터 로딩 중”일 때 보여주는 플레이스홀더(UI skeleton)
     return (
       <Container maxWidth="lg" sx={{ py: 14 }}>
         <StyledPaper elevation={2}>
