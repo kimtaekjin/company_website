@@ -2,12 +2,7 @@ import "./index.css";
 import "./App.css";
 import Navbar from "./Components/Navbar/Navbar";
 // import { BrowserRouter } from "react-router-dom";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 
 import Footer from "./Components/Footer/Footer";
 import MainPage from "./Page/MainPage/MainPage";
@@ -24,6 +19,7 @@ import AdminEditPost from "./Page/Admin/AdminEditPost";
 import AdminContacts from "./Page/Admin/AdminContacts";
 import AdminNavbar from "./Components/AdminNavbar/AdminNavbar";
 import axios from "axios";
+import SinglePost from "./Page/SinglePost.jsx/SinglePost";
 
 function AuthRedirectRoute() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -31,11 +27,7 @@ function AuthRedirectRoute() {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/auth/verify-token",
-          {},
-          { withCredentials: true }
-        );
+        const response = await axios.post("http://localhost:3000/api/auth/verify-token", {}, { withCredentials: true });
         setIsAuthenticated(true);
       } catch (error) {
         console.log("토큰 인증 실패: ", error);
@@ -59,11 +51,7 @@ function ProtectedRoute() {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/auth/verify-token",
-          {},
-          { withCredentials: true }
-        );
+        const response = await axios.post("http://localhost:3000/api/auth/verify-token", {}, { withCredentials: true });
         setIsAuthenticated(response.data.isValid);
         setUser(response.data.user);
       } catch (error) {
@@ -79,11 +67,7 @@ function ProtectedRoute() {
     return null;
   }
 
-  return isAuthenticated ? (
-    <Outlet context={{ user }} />
-  ) : (
-    <Navigate to="/admin" replace />
-  );
+  return isAuthenticated ? <Outlet context={{ user }} /> : <Navigate to="/admin" replace />;
 }
 
 function Layout() {
@@ -124,6 +108,10 @@ const router = createBrowserRouter([
       {
         path: "/board",
         element: <Board />,
+      },
+      {
+        path: "/post/:id",
+        element: <SinglePost />,
       },
       {
         path: "/our-services",
