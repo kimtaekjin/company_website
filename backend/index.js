@@ -13,7 +13,7 @@ const uploadRoutes = require("./routes/upload");
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", //배포할 경우 배포한 도메인을 새로 넣어줘야 한다!
     credentials: true,
   })
 );
